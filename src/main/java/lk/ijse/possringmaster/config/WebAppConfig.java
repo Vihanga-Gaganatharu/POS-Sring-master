@@ -1,4 +1,4 @@
-package lk.ijse.possystembackendspring.config;
+package lk.ijse.possringmaster.config;
 
 import jakarta.servlet.annotation.MultipartConfig;
 import org.springframework.context.annotation.ComponentScan;
@@ -8,9 +8,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
-@ComponentScan(basePackages = "lk.ijse.possystembackendspring")
+@ComponentScan(basePackages = "lk.ijse.possringmaster")
 @EnableWebMvc
-@EnableJpaRepositories(basePackages = "lk.ijse.possystembackendspring")
+@EnableJpaRepositories(basePackages = "lk.ijse.possringmaster")
 @EnableTransactionManagement
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024 * 2, //2MB

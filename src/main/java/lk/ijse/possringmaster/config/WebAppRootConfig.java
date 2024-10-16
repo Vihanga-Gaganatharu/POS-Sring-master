@@ -1,4 +1,4 @@
-package lk.ijse.possystembackendspring.config;
+package lk.ijse.possringmaster.config;
 
 
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
@@ -20,8 +20,8 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@ComponentScan(basePackages = "lk.ijse.possystembackendspring")
-@EnableJpaRepositories(basePackages = "lk.ijse.possystembackendspring")
+@ComponentScan(basePackages = "lk.ijse.possringmaster")
+@EnableJpaRepositories(basePackages = "lk.ijse.possringmaster")
 @EnableTransactionManagement
 public class WebAppRootConfig {
     @Bean
@@ -35,7 +35,7 @@ public class WebAppRootConfig {
         dmds.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dmds.setUrl("jdbc:mysql://localhost:3306/posSystemAAD?createDatabaseIfNotExist=true");
         dmds.setUsername("root");
-        dmds.setPassword("Mahee@10985");
+        dmds.setPassword("1234");
         return dmds;
     }
 
