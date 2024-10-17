@@ -6,9 +6,9 @@ import lk.ijse.possringmaster.dto.ItemDto;
 import java.util.List;
 
 public interface ItemService {
-    void saveItem(ItemDto itemDto);
-    void updateItem(ItemDto itemDto);
-    void deleteItem(String itemDto);
-    ItemResponse getSelectedItem(String itemId);
-    List<ItemDto> getAllItem();
+    String saveItem(ItemDto itemDTO);
+    void updateItem(String id, ItemDto itemDTO);
+    void deleteItem(String id);
+    ItemResponse getItemById(String id);
+    List<ItemDto> getAllItems();
 }

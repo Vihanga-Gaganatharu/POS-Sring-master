@@ -1,19 +1,21 @@
 package lk.ijse.possringmaster.service;
 
-import jakarta.transaction.Transactional;
-import lk.ijse.possringmaster.dao.CustomerDAO;
 import lk.ijse.possringmaster.dao.ItemDAO;
 import lk.ijse.possringmaster.dao.OrderDAO;
-import lk.ijse.possringmaster.dao.OrderDetailsDAO;
 import lk.ijse.possringmaster.dto.OrderDto;
-import lk.ijse.possringmaster.entity.CustomerEntity;
+import lk.ijse.possringmaster.dto.OrderDetailDto;
 import lk.ijse.possringmaster.entity.ItemEntity;
 import lk.ijse.possringmaster.entity.OrderDetailsEntity;
+import lk.ijse.possringmaster.entity.OrderEntity;
+import lk.ijse.possringmaster.exception.DataPersistFailedException;
+import lk.ijse.possringmaster.exception.ItemNotFoundException;
+import lk.ijse.possringmaster.service.OrderService;
 import lk.ijse.possringmaster.util.AppUtil;
 import lk.ijse.possringmaster.util.MappingUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,48 +24,69 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
-
     @Autowired
     private final OrderDAO orderDAO;
-    @Autowired
-    private final CustomerDAO customerDAO;
+
     @Autowired
     private final ItemDAO itemDAO;
-    @Autowired
-    private final OrderDetailsDAO orderDetailsDAO;
 
     @Autowired
-    private final MappingUtil mapping;
+    private final MappingUtil mappingUtil;
 
     @Override
-    @Transactional
-    public void saveOrders(OrderDto orderDto) {
-        CustomerEntity customer = customerDAO.getCustomerEntitiesById(orderDto.getCustomerId());
+    public String saveOrder(OrderDto orderDTO) {
+        orderDTO.setOrderId(generateOrderID());
+        orderDTO.setOrderDateTime(AppUtil.getCurrentDateTime());
+        orderDTO.setTotal(orderDTO.getOrderDetails().stream().mapToDouble(detail -> detail.getQty() * detail.getUnitPrice()).sum());
+        OrderEntity orderEntity = mappingUtil.convertToOrderEntity(orderDTO);
 
-        orderDto.setId(AppUtil.createOrderId());
-        System.out.println(orderDto);
-        var orderEntity = mapping.convertToOrderEntity(orderDto);
+        List<OrderDetailsEntity> orderDetailEntities = orderDTO.getOrderDetails().stream().map(detail -> {
+                    OrderDetailsEntity orderDetailEntity = mappingUtil.convertToOrderDetailEntity(detail);
+                    orderDetailEntity.setDescription("Payment Verified");
+                    orderDetailEntity.setOrder(orderEntity);
+                    return orderDetailEntity;
+                })
+                .collect(Collectors.toList());
 
-        List<OrderDetailsEntity> orderDetails = orderDto.getOrderDetailDtos().stream().map(orderDetailDto -> {
-            OrderDetailsEntity orderDetailsEntity = mapping.convertToOrderDetailEntity(orderDetailDto);
-            orderDetailsEntity.setOrder(orderEntity);
-            orderDetailsDAO.save(orderDetailsEntity);
+        orderEntity.setOrderDetails(orderDetailEntities);
+        boolean allItemsUpdated = orderDTO.getOrderDetails().stream().allMatch(this::updateItemQty);
 
-            ItemEntity item = itemDAO.findById(orderDetailDto.getItemid()).orElseThrow(() -> new RuntimeException("Item not found"));
-
-            item.setQty(item.getQty() - orderDetailDto.getQty());
-            orderDetailsEntity.setItem(item);
-            itemDAO.save(item);
-            return orderDetailsEntity;
-        }).collect(Collectors.toList());
-
-        orderEntity.setOrderDetailsList(orderDetails);
-
-        orderDAO.save(orderEntity);
+        if (allItemsUpdated) {
+            orderDAO.save(orderEntity);
+            return "Order placed successfully";
+        } else {
+            throw new DataPersistFailedException("place order failed");
+        }
     }
 
-    @Override
-    public List<OrderDto> getAllOrders()  {
-        return mapping.convertToOrderDTOList(orderDAO.findAll());
+    private boolean updateItemQty(OrderDetailDto orderDetailDTO) {
+        ItemEntity item = itemDAO.findById(orderDetailDTO.getItemCode()).orElse(null);
+        if (item == null) {
+            throw new ItemNotFoundException("Item not found");
+        }
+
+        if (item.getQtyOnHand() < orderDetailDTO.getQty()) {
+            throw new ItemNotFoundException("Item qty not enough");
+        }
+
+        item.setQtyOnHand(item.getQtyOnHand() - orderDetailDTO.getQty());
+        itemDAO.save(item);
+        return true;
+    }
+
+    private String generateOrderID() {
+        if (orderDAO.count() == 0) {
+            return "O001";
+        } else {
+            String lastId = orderDAO.findAll().get(orderDAO.findAll().size() - 1).getOrderId();
+            int newId = Integer.parseInt(lastId.substring(1)) + 1;
+            if (newId < 10) {
+                return "O00" + newId;
+            } else if (newId < 100) {
+                return "O0" + newId;
+            } else {
+                return "O" + newId;
+            }
+        }
     }
 }

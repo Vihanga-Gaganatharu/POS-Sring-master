@@ -1,15 +1,15 @@
 package lk.ijse.possringmaster.util;
 
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class AppUtil {
-    public static String createCustomerId(){
-        return "Customer-"+ UUID.randomUUID();
-    }
-    public static String createItemId(){
-        return "Item-"+ UUID.randomUUID();
-    }
-    public static String createOrderId(){
-        return "Order-"+ UUID.randomUUID();
-    }
+        public static String getCurrentDateTime() {
+            return LocalDateTime.now().toString();
+        }
+
+        public static String getCurrentDate() {
+            return LocalDate.now().toString();
+        }
 }
+

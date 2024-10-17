@@ -1,11 +1,14 @@
 package lk.ijse.possringmaster.controller;
+
+import jakarta.validation.Valid;
 import lk.ijse.possringmaster.customObj.ItemResponse;
 import lk.ijse.possringmaster.dto.ItemDto;
-import lk.ijse.possringmaster.exception.CustomerNotFoundException;
 import lk.ijse.possringmaster.exception.DataPersistFailedException;
 import lk.ijse.possringmaster.exception.ItemNotFoundException;
 import lk.ijse.possringmaster.service.ItemService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,76 +18,73 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/items")
+@RequestMapping("/api/v1/items")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
-
 public class ItemController {
     @Autowired
     private final ItemService itemService;
 
-    //save
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveItem(@RequestBody ItemDto itemDto) {
+    static Logger logger = LoggerFactory.getLogger(ItemController.class);
 
-        try {
-            itemService.saveItem(itemDto);
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (DataPersistFailedException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> saveItem(@Valid @RequestBody ItemDto itemDTO) {
+        if (itemDTO == null) {
+            return ResponseEntity.badRequest().build();
+        } else {
+            try {
+                itemService.saveItem(itemDTO);
+                logger.info("Item saved : " + itemDTO);
+                return ResponseEntity.created(null).build();
+            } catch (DataPersistFailedException e) {
+                return ResponseEntity.badRequest().build();
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                return ResponseEntity.internalServerError().build();
+            }
         }
+    }
+
+    @GetMapping(value = "/{itemCode}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ItemResponse getItemById(@PathVariable("itemCode") String itemCode) {
+        return itemService.getItemById(itemCode);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ItemDto> getAllItem() {
-        System.out.println("itemService.getAllItem() = " + itemService.getAllItem());
-        return itemService.getAllItem();
+    public List<ItemDto> getAllItems() {
+        return itemService.getAllItems();
     }
 
-    @GetMapping(value = "/{itemId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ItemResponse getSelectedItem(@PathVariable("itemId") String itemId) {
-        {
-            return itemService.getSelectedItem(itemId);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PatchMapping(value = "/{itemCode}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateItem(@Valid @RequestBody ItemDto itemDTO, @PathVariable("itemCode") String itemCode) {
+        if (itemDTO == null || itemCode == null) {
+            return ResponseEntity.badRequest().build();
+        } else {
+            try {
+                itemService.updateItem(itemCode, itemDTO);
+                logger.info("Item updated : " + itemDTO);
+                return ResponseEntity.noContent().build();
+            } catch (DataPersistFailedException e) {
+                return ResponseEntity.badRequest().build();
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                return ResponseEntity.internalServerError().build();
+            }
         }
-
     }
 
-    @PatchMapping(value = "/{itemId}",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateItem(@PathVariable ("itemId") String itemId, @RequestBody ItemDto itemDto) {
-//        try {
-//            if (item == null && (itemId == null || item.equals(""))){
-//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//            }
-//            itemService.updateItem(itemId, item);
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }catch (ItemNotFoundException e){
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }catch (Exception e){
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
+    @DeleteMapping("/{itemCode}")
+    public ResponseEntity<Void> deleteItem(@PathVariable("itemCode") String itemCode) {
         try {
-            itemDto.setId(itemId);
-            itemService.updateItem(itemDto);
-
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (CustomerNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            itemService.deleteItem(itemCode);
+            logger.info("Item deleted : " + itemCode);
+            return ResponseEntity.noContent().build();
+        } catch (ItemNotFoundException e) {
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-    }
-    @DeleteMapping(value ="/{itemId}" )
-    public ResponseEntity<Void> deleteItem(@PathVariable ("itemId") String itemId) {
-        try {
-            itemService.deleteItem(itemId);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }catch (ItemNotFoundException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error(e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
-

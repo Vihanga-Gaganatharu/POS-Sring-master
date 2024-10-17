@@ -25,6 +25,6 @@ public class OrderEntity implements Serializable {
     private double total;
     private String paymentMethod;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<OrderDetailEntity> orderDetails;
+    private List<OrderDetailsEntity> orderDetails;
 }
 

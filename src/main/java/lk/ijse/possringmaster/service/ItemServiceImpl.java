@@ -1,19 +1,17 @@
 package lk.ijse.possringmaster.service;
 
-import jakarta.transaction.Transactional;
-import lk.ijse.possringmaster.customObj.ItemErrorResponse;
 import lk.ijse.possringmaster.customObj.ItemResponse;
 import lk.ijse.possringmaster.dao.ItemDAO;
 import lk.ijse.possringmaster.dto.ItemDto;
 import lk.ijse.possringmaster.entity.ItemEntity;
-import lk.ijse.possringmaster.exception.DataPersistFailedException;
 import lk.ijse.possringmaster.exception.ItemNotFoundException;
+import lk.ijse.possringmaster.service.ItemService;
 import lk.ijse.possringmaster.util.AppUtil;
 import lk.ijse.possringmaster.util.MappingUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.Mapping;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,58 +20,76 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-
     @Autowired
     private final ItemDAO itemDAO;
+
     @Autowired
-    private final MappingUtil mapping;
+    private final MappingUtil mappingUtil;
 
     @Override
-    public void saveItem(ItemDto itemDto) {
-        itemDto.setId(AppUtil.createItemId());
-        var itemEntity = mapping.convertToItemEntity(itemDto);
-        var savedItem = itemDAO.save(itemEntity);
-        if(savedItem == null){
-            throw new DataPersistFailedException("Cannot save");
-        }
+    public String saveItem(ItemDto itemDTO) {
+        itemDTO.setItemCode(generateItemID());
+        itemDTO.setRegisterDate(AppUtil.getCurrentDate());
+        ItemEntity itemEntity = mappingUtil.convertToItemEntity(itemDTO);
+        itemDAO.save(itemEntity);
+        System.out.println("Item saved : " + itemEntity);
+        return "Item saved successfully";
     }
 
     @Override
-    public void updateItem(ItemDto itemDto) {
-        Optional<ItemEntity> tmpItem = itemDAO.findById(itemDto.getId());
-        System.out.println("tmpItem = " + tmpItem);
-        if(!tmpItem.isPresent()){
+    public void updateItem(String id, ItemDto itemDTO) {
+        Optional<ItemEntity> tmpItem = itemDAO.findById(id);
+        if (!tmpItem.isPresent()) {
+            System.out.println("Item not found");
             throw new ItemNotFoundException("Item not found");
-        }else {
-            tmpItem.get().setName(itemDto.getName());
-            tmpItem.get().setPrice(itemDto.getPrice());
-            tmpItem.get().setQty(itemDto.getQty());
+        } else {
+            tmpItem.get().setCategory(itemDTO.getCategory());
+            tmpItem.get().setUnitPrice(itemDTO.getUnitPrice());
+            tmpItem.get().setQtyOnHand(itemDTO.getQtyOnHand());
+            tmpItem.get().setExpireDate(itemDTO.getExpireDate());
+            System.out.println("Item updated : " + itemDTO);
         }
     }
 
     @Override
-    public void deleteItem(String itemId) {
-        Optional<ItemEntity> findId = itemDAO.findById(itemId);
-        if(!findId.isPresent()){
+    public void deleteItem(String id) {
+        if (itemDAO.existsById(id)) {
+            itemDAO.deleteById(id);
+            System.out.println("Item deleted : " + id);
+        } else {
+            System.out.println("Item not found");
             throw new ItemNotFoundException("Item not found");
-        }else {
-            itemDAO.deleteById(itemId);
         }
     }
 
     @Override
-    public ItemResponse getSelectedItem(String itemId) {
-        if(itemDAO.existsById(itemId)){
-            return mapping.convertToItemDTO(itemDAO.getReferenceById(itemId));
-        }else {
-            return new ItemErrorResponse(0,"Item not found");
+    public ItemResponse getItemById(String id) {
+        if (itemDAO.existsById(id)) {
+            return mappingUtil.convertToItemDTO(itemDAO.getReferenceById(id));
+        } else {
+            throw new ItemNotFoundException("Item not found");
         }
     }
 
     @Override
-    public List<ItemDto> getAllItem() {
-
-        return mapping.convertToItemDTOList(itemDAO.findAll());
-
+    public List<ItemDto> getAllItems() {
+        return mappingUtil.convertToItemDTOList(itemDAO.findAll());
     }
+
+    private String generateItemID() {
+        if (itemDAO.count() == 0) {
+            return "I001";
+        } else {
+            String lastId = itemDAO.findAll().get(itemDAO.findAll().size() - 1).getItemCode();
+            int newId = Integer.parseInt(lastId.substring(1)) + 1;
+            if (newId < 10) {
+                return "I00" + newId;
+            } else if (newId < 100) {
+                return "I0" + newId;
+            } else {
+                return "I" + newId;
+            }
+        }
+    }
+
 }

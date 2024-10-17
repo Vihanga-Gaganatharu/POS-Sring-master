@@ -8,9 +8,9 @@ import lk.ijse.possringmaster.dto.CustomerDto;
 import java.util.List;
 
 public interface CustomerService {
-    void saveCustomer(CustomerDto customerDto);
-    void updateCustomer(CustomerDto customerDto);
-    void deleteCustomer(String customerId) throws ClassNotFoundException;
-    CustomerResponse getSelectedCustomer(String customerId);
-    List<CustomerDto> getAllCustomer();
+    String saveCustomer(CustomerDto customerDTO);
+    void updateCustomer(String id, CustomerDto customerDTO);
+    void deleteCustomer(String id);
+    CustomerResponse getCustomerById(String id);
+    List<CustomerDto> getAllCustomers();
 }

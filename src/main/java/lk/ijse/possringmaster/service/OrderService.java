@@ -6,8 +6,5 @@ import lk.ijse.possringmaster.dto.OrderDto;
 import java.util.List;
 
 public interface OrderService {
-
-    void saveOrders(OrderDto orderDto);
-    List<OrderDto> getAllOrders();
-
+    String saveOrder(OrderDto orderDTO);
 }
