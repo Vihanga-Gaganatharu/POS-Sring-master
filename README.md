@@ -28,3 +28,39 @@ This is a simple Point of Sale (POS) system built using the **Spring Framework**
 ```bash
 git https://github.com/Vihanga-Gaganatharu/POS-Sring-master.git
 ```
+
+
+
+<h2>API Endpoints</h2>
+
+<h3>Customer Endpoints</h3>
+
+* GET /customer: Retrieve all customers.
+* POST /customer: Create a new customer.
+* PUT /customer: Update an existing customer.
+* DELETE /customer/{id}: Delete a customer by ID.
+
+<h3>Item Endpoints</h3>
+
+* GET /item: Retrieve all items.
+* POST /item: Create a new item.
+* PUT /item: Update an existing item.
+* DELETE /item/{id}: Delete an item by ID.
+
+<h3>Order Endpoints</h3>
+
+* POST /order: Create a new order.
+
+<h2>💻 Built with</h2>
+
+Technologies used in the project:
+
+*   Spring- Backend framework in java
+*   Hibernate- ORM for database interaction
+*   Spring Data JPA- Data repository layer
+*   MySQL- Database
+*   Lombok- To reduce boilerplate code
+
+<h2> API Documentation </h2>
+
+* You can view the detailed API documentation with example requests and responses <a href="https://documenter.getpostman.com/view/35385296/2sAXxV7Ayv">here</a>.
