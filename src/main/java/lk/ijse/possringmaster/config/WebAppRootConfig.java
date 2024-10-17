@@ -1,8 +1,6 @@
 package lk.ijse.possringmaster.config;
 
 
-import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
-import jakarta.annotation.PreDestroy;
 import jakarta.persistence.EntityManagerFactory;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
@@ -17,11 +15,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = "lk.ijse.possringmaster")
-@EnableJpaRepositories(basePackages = "lk.ijse.possringmaster")
+@EnableJpaRepositories
 @EnableTransactionManagement
 public class WebAppRootConfig {
     @Bean
@@ -31,44 +28,31 @@ public class WebAppRootConfig {
 
     @Bean
     public DataSource dataSource() {
-        var dmds = new DriverManagerDataSource();
-        dmds.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dmds.setUrl("jdbc:mysql://localhost:3306/posSystemAAD?createDatabaseIfNotExist=true");
-        dmds.setUsername("root");
-        dmds.setPassword("1234");
-        return dmds;
+        DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
+        driverManagerDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        driverManagerDataSource.setUrl("jdbc:mysql://localhost:3306/spring_pos?createDatabaseIfNotExist=true");
+        driverManagerDataSource.setUsername("root");
+        driverManagerDataSource.setPassword("1234");
+        return driverManagerDataSource;
     }
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setGenerateDdl(true);
-
         LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
         factory.setJpaVendorAdapter(vendorAdapter);
-        factory.setPackagesToScan("lk.ijse.possystembackendspring.entity");
+        factory.setPackagesToScan("lk.ijse.possringmaster.entity");
         factory.setDataSource(dataSource());
-
-        Properties jpaProperties = new Properties();
-        jpaProperties.put("hibernate.hbm2ddl.auto", "update");
-        jpaProperties.put("hibernate.show_sql", "true");
-        jpaProperties.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
-//        jpaProperties.put("hibernate.connection.provider_disables_autocommit", "true");
-
-        factory.setJpaProperties(jpaProperties);
         return factory;
     }
 
     @Bean
     public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
-        JpaTransactionManager txManager = new JpaTransactionManager();
-        txManager.setEntityManagerFactory(entityManagerFactory);
-        return txManager;
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(entityManagerFactory);
+        return transactionManager;
     }
 
-    @PreDestroy
-    public void cleanup() {
-        AbandonedConnectionCleanupThread.checkedShutdown();
-    }
+
 }

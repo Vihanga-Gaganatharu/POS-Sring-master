@@ -22,5 +22,5 @@ public class ItemEntity implements Serializable {
     private String registerDate;
     private String expireDate;
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-    private List<OrderDetailEntity> orderDetails;
+    private List<OrderDetailsEntity> orderDetails;
 }
