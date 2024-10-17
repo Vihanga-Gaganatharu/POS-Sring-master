@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -12,13 +13,14 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "items")
-public class ItemEntity implements SuperEntity {
+public class ItemEntity implements Serializable {
     @Id
-    private String id;
-    private String name;
-    private int qty;
-    @Column(columnDefinition = "DECIMAL(10,2)")
-    private double price;
+    private String itemCode;
+    private String category;
+    private double unitPrice;
+    private int qtyOnHand;
+    private String registerDate;
+    private String expireDate;
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-    private List<OrderDetailsEntity> orderDetailsList;
+    private List<OrderDetailEntity> orderDetails;
 }

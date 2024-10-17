@@ -8,6 +8,8 @@ import lk.ijse.possringmaster.dto.ItemDto;
 import lk.ijse.possringmaster.entity.ItemEntity;
 import lk.ijse.possringmaster.exception.DataPersistFailedException;
 import lk.ijse.possringmaster.exception.ItemNotFoundException;
+import lk.ijse.possringmaster.util.AppUtil;
+import lk.ijse.possringmaster.util.MappingUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private final ItemDAO itemDAO;
     @Autowired
-    private final Mapping mapping;
+    private final MappingUtil mapping;
 
     @Override
     public void saveItem(ItemDto itemDto) {

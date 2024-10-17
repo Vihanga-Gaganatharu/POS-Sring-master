@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -14,25 +15,16 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "orders")
-public class OrderEntity implements SuperEntity {
+public class OrderEntity implements Serializable {
     @Id
-    private String id;
-    @CreationTimestamp
-    private Timestamp date;
-    @Column(columnDefinition = "DECIMAL(10,2)")
-    private double total;
-    @Column(columnDefinition = "DECIMAL(10,2)")
-    private double discount;
-    @Column(columnDefinition = "DECIMAL(10,2)")
-    private double subTotal;
-    @Column(columnDefinition = "DECIMAL(10,2)")
-    private double cash;
-    @Column(columnDefinition = "DECIMAL(10,2)")
-    private double balance;
+    private String orderId;
     @ManyToOne
-    @JoinColumn(name = "customerId")
+    @JoinColumn(name = "customer_id", referencedColumnName = "customerId")
     private CustomerEntity customer;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderDetailsEntity> orderDetailsList;
+    private String orderDateTime;
+    private double total;
+    private String paymentMethod;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderDetailEntity> orderDetails;
 }
+

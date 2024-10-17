@@ -10,7 +10,7 @@ import lk.ijse.possringmaster.entity.CustomerEntity;
 import lk.ijse.possringmaster.entity.ItemEntity;
 import lk.ijse.possringmaster.entity.OrderDetailsEntity;
 import lk.ijse.possringmaster.util.AppUtil;
-import lk.ijse.possringmaster.util.Mapping;
+import lk.ijse.possringmaster.util.MappingUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailsDAO orderDetailsDAO;
 
     @Autowired
-    private final Mapping mapping;
+    private final MappingUtil mapping;
 
     @Override
     @Transactional
@@ -57,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
             return orderDetailsEntity;
         }).collect(Collectors.toList());
 
-        orderEntity.setOrderDetails(orderDetails);
+        orderEntity.setOrderDetailsList(orderDetails);
 
         orderDAO.save(orderEntity);
     }

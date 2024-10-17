@@ -2,8 +2,12 @@ package lk.ijse.possringmaster.util;
 
 import lk.ijse.possringmaster.dto.CustomerDto;
 import lk.ijse.possringmaster.dto.ItemDto;
+import lk.ijse.possringmaster.dto.OrderDetailDto;
+import lk.ijse.possringmaster.dto.OrderDto;
 import lk.ijse.possringmaster.entity.CustomerEntity;
 import lk.ijse.possringmaster.entity.ItemEntity;
+import lk.ijse.possringmaster.entity.OrderDetailsEntity;
+import lk.ijse.possringmaster.entity.OrderEntity;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class Mapping {
+public class MappingUtil {
     @Autowired
     private ModelMapper modelMapper;
 

@@ -7,6 +7,9 @@ import lk.ijse.possringmaster.dao.CustomerDAO;
 import lk.ijse.possringmaster.dto.CustomerDto;
 import lk.ijse.possringmaster.entity.CustomerEntity;
 import lk.ijse.possringmaster.exception.CustomerNotFoundException;
+import lk.ijse.possringmaster.exception.DataPersistFailedException;
+import lk.ijse.possringmaster.util.AppUtil;
+import lk.ijse.possringmaster.util.MappingUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.spi.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private final CustomerDAO customerDAO;
     @Autowired
-    private final Mapping mapping;
+    private final MappingUtil mapping;
 
     @Override
     public void saveCustomer(CustomerDto customerDto) {
