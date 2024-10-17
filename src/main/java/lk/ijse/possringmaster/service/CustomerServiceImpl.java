@@ -1,16 +1,14 @@
 package lk.ijse.possringmaster.service;
 
 import jakarta.transaction.Transactional;
-import lk.ijse.possystembackendspring.customObj.CustomerErrorResponse;
-import lk.ijse.possystembackendspring.customObj.CustomerResponse;
-import lk.ijse.possystembackendspring.dao.CustomerDAO;
-import lk.ijse.possystembackendspring.dto.CustomerDto;
-import lk.ijse.possystembackendspring.entity.CustomerEntity;
-import lk.ijse.possystembackendspring.exception.CustomerNotFoundException;
-import lk.ijse.possystembackendspring.exception.DataPersistFailedException;
-import lk.ijse.possystembackendspring.util.AppUtil;
-import lk.ijse.possystembackendspring.util.Mapping;
+import lk.ijse.possringmaster.customObj.CustomerErrorResponse;
+import lk.ijse.possringmaster.customObj.CustomerResponse;
+import lk.ijse.possringmaster.dao.CustomerDAO;
+import lk.ijse.possringmaster.dto.CustomerDto;
+import lk.ijse.possringmaster.entity.CustomerEntity;
+import lk.ijse.possringmaster.exception.CustomerNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.spi.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

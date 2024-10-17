@@ -1,6 +1,7 @@
 package lk.ijse.possringmaster.dao;
 
-import lk.ijse.possystembackendspring.entity.CustomerEntity;
+
+import lk.ijse.possringmaster.entity.CustomerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

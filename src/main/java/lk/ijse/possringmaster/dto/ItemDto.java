@@ -1,18 +1,17 @@
 package lk.ijse.possringmaster.dto;
 
-
-import lk.ijse.possringmaster.customObj.CustomerResponse;
+import lk.ijse.possringmaster.customObj.ItemResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class CustomerDto implements SuperDto, CustomerResponse {
+public class ItemDto implements SuperDto, ItemResponse {
 
     private String id;
     private String name;
-    private String address;
-    private double salary;
+    private int qty;
+    private double price;
 }

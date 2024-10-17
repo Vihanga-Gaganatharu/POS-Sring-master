@@ -1,8 +1,9 @@
 package lk.ijse.possringmaster.service;
 
 
-import lk.ijse.possystembackendspring.customObj.CustomerResponse;
-import lk.ijse.possystembackendspring.dto.CustomerDto;
+
+import lk.ijse.possringmaster.customObj.CustomerResponse;
+import lk.ijse.possringmaster.dto.CustomerDto;
 
 import java.util.List;
 
